@@ -1,1 +1,1 @@
-Persons app: https://morning-journey-69027.herokuapp.com/
+Persons app: https://devcenter.heroku.com/articles/git
