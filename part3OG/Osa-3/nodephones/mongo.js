@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const mongoose = require('mongoose')
 
 if (process.argv.length<3) {
@@ -21,23 +22,23 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 if(process.argv.length === 3){
-    console.log("phonebook:")
-    console.log("What is perosn in mongo.js", Person)
-    Person.find({}).then(result => {
-        result.forEach(human => {
-            console.log(human)
-        })
-    mongoose.connection.close()
+  console.log('phonebook:')
+  console.log('What is perosn in mongo.js', Person)
+  Person.find({}).then(result => {
+    result.forEach(human => {
+      console.log(human)
     })
+    mongoose.connection.close()
+  })
 }
 
 if(process.argv.length === 5){
-    const human = new Person({
-        name: process.argv[3],
-        number: process.argv[4]
-    })
-    human.save().then(response => {
-        console.log(`adde ${human.name} ${human.number} to phonebook`)
-        mongoose.connection.close()
-    })
+  const human = new Person({
+    name: process.argv[3],
+    number: process.argv[4]
+  })
+  human.save().then(() => {
+    console.log(`adde ${human.name} ${human.number} to phonebook`)
+    mongoose.connection.close()
+  })
 }
