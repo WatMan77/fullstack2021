@@ -1,0 +1,6 @@
+[submodule "Osa 3/nodephonesHeroku"]
+	path = Osa 3/nodephonesHeroku
+	url = https://git.heroku.com/morning-journey-69027.git
+[submodule "Osa 3/nodephonesHeroku2"]
+	path = Osa 3/nodephonesHeroku2
+	url = https://git.heroku.com/morning-journey-69027.git
