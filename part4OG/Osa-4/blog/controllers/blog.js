@@ -21,34 +21,31 @@ blogRouter.post('/', async(request, response) => {
     request.body.likes = 0
   }
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if(!request.token || !decodedToken.id) {
+  if(!request.token || !request.user.id) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
-  const user = await User.findById(decodedToken.id)
-
-  request.body.user = user._id
+  request.body.user = request.user._id // The blog schema needs the user in the body!!
   const blog = new Blog(request.body)
+
   const savedBlog = await blog.save()
-  user.blogs = user.blogs.concat(savedBlog)
-  await user.save()
+  request.user.blogs = request.user.blogs.concat(savedBlog)
+  await request.user.save()
   response.status(201).json(savedBlog)
 })
 
 blogRouter.delete('/:id', async(request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
 
-  if(!request.token || !decodedToken.id){
+  if(!request.token || !request.user.id){
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
-  const user = await User.findById(decodedToken.id)
   const toDelete = await Blog.findById(request.params.id)
-  if(toDelete.user.toString() === user.id.toString()){
+  
+  if(toDelete.user.toString() === request.user.id.toString()){
     await Blog.findByIdAndDelete(request.params.id)
     response.status(204).end()
-  } else if(toDelete && toDelete.user.toString() !== user.id.toString()) {
+  } else if(toDelete && toDelete.user.toString() !== request.user.id.toString()) {
     return response.status(401).json({ error: 'not authorised to remove this blog'})   
   } else {
     return response.status(401).json({ error: 'blog not found' })

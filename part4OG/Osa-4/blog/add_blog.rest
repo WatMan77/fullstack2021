@@ -1,6 +1,6 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFyc2thIiwiaWQiOiI2MGQxZGIyYzNmNzBhNDMwMzRiODgyODgiLCJpYXQiOjE2MjQzODQxMTZ9.zYDdKRbhUdu8oXi6k2XfvkElRfCfC-6SOlJAQ2oLcNo
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFyc2thIiwiaWQiOiI2MGQxZGIyYzNmNzBhNDMwMzRiODgyODgiLCJpYXQiOjE2MjQzODUwNzB9.knFL5zEaT9i5SgJMenNaA4hNz-mv_EedDyopn5w68Xk
 
 {
   "title": "Authorized book 2",
