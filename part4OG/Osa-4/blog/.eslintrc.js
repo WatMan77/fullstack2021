@@ -1,8 +1,10 @@
 module.exports = {
   'env': {
-    'browser': true,
+    'browser': true, // Is this needed?
     'commonjs': true,
-    'es2021': true
+    'es2021': true,
+    "node": true,
+    "jest/globals": true // Also with. Got rid of the "expect" not defined errors
   },
   'extends': 'eslint:recommended',
   'parserOptions': {

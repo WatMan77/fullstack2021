@@ -39,7 +39,6 @@ const tokenExtractor = (request, response, next) => {
 const userExtractor = async(request, response, next) => {
 
   if(request.token){
-    console.log('User middleware on its way!')
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
     const user = await User.findById(decodedToken.id)
     request.user = user
