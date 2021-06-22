@@ -1,5 +1,15 @@
 /* eslint-disable no-undef */
 const listHelper = require('../utils/list_helpers.js')
+
+const dummyBlog = {
+  _id: '0xFFFFFFF',
+  title: 'Life is empty',
+  author: 'Nobody',
+  url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+  likes: -1,
+  __v: 0
+}
+
 const blogs = [
   {
     _id: '5a422a851b54a676234d17f7',
@@ -77,7 +87,13 @@ describe('total likes', () => {
 })
 
 describe('favorite blog', () => {
-  test('favorite blog should be the third in the list', () => {
+
+  test('should be the dummy blog if the list is empty', () => {
+    const result = listHelper.favoriteBlog([])
+    expect(result).toEqual(dummyBlog)
+  })  
+
+  test('should be the third in the list', () => {
     const result = listHelper.favoriteBlog(blogs)
     expect(result).toEqual(blogs[2])
   })
