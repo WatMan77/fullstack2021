@@ -17,12 +17,13 @@ blogRouter.post('/', async(request, response) => {
     response.status(400).end() //end() is needed it seems
     return
   }
-  if(!request.body.likes){
-    request.body.likes = 0
-  }
 
   if(!request.token || !request.user.id) {
     return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
+  if(!request.body.likes){
+    request.body.likes = 0
   }
 
   request.body.user = request.user._id // The blog schema needs the user in the body!!
@@ -54,16 +55,27 @@ blogRouter.delete('/:id', async(request, response) => {
 
 blogRouter.put('/:id', async(request, response) => {
 
+  if(!request.token || !request.user.id){
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
   const body = request.body
+
+  const toChange = await Blog.findById(request.params.id)
+
+  if(!toChange.user || toChange.user.toString() !== request.user.id.toString()){
+    return response.status(401).json({ error: 'not authorised to modify this blog' })
+  }
 
   const blog = {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes
+    likes: body.likes,
+    // user: toChange.user
   }
-  const updatetBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-  response.json(updatetBlog)
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+  response.json(updatedBlog)
 })
 
 module.exports = blogRouter

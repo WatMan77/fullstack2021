@@ -4,6 +4,13 @@ const app = require('../app')
 const Blog = require('../models/blog.js')
 const api = supertest(app)
 const helpers = require('../utils/list_helpers.js')
+const User = require('../models/user.js')
+
+const dummyUser = {
+  username: 'Arska',
+  name: 'Arto Hellas',
+  password: 'JustSomePassword123'
+}
 
 const blogs = [
   {
@@ -43,18 +50,31 @@ const blogs = [
     likes: 2,
   }  
 ]
-
+// NOTE! Make sure the user_api tests work. Otherwise we cannot get the token
 beforeEach(async () => {
+  await User.deleteMany({})
+  await api
+    .post('/api/users')
+    .send(dummyUser)
+
+  const users = await User.find({})
+  dummyUser.id = users[0]._id.toString()
+
   await Blog.deleteMany({})
   let blogObject = new Blog(blogs[0])
   await blogObject.save()
   blogObject = new Blog(blogs[1])
   await blogObject.save()
-})
+
+  const response = await api
+    .post('/api/login')
+    .send({ username: dummyUser.username, password: dummyUser.password })
+  
+  dummyUser.token = 'bearer '.concat(response.body.token)
+  })
 
 describe('GET request tests', () => {
 
-  // eslint-disable-next-line no-undef
   test('should work in itself', async() => {
     await api
       .get('/api/blogs')
@@ -80,32 +100,40 @@ describe('GET request tests', () => {
   })
 })
 
-describe('Normal post requests', () => {
+describe('Normal POST requests', () => {
   
   test('adding a blog should work', async() => {
 
-    await api.post('/api/blogs')
+    await api
+      .post('/api/blogs')
+      .set('Authorization', dummyUser.token)
       .send(blogs[3])
       .expect(201)
 
     const response = await api.get('/api/blogs')
+
     expect(response.body).toHaveLength(3)
-    delete response.body[2].id // Again, cannot compare if the variables in the object are different
+    expect(response.body[2].user.id.toString()).toEqual(dummyUser.id) // Check the owner
+
+    delete response.body[2].id
+    delete response.body[2].user // Check the right blog was added
     expect(response.body[2]).toEqual(blogs[3])
   })
 
-  test('blog withouth likes should get a default value 0', async() => {
-    const toSend = blogs[blogs.length - 1]
-    delete toSend.likes // Delete the likes for the test
+  test('blog without likes should get a default value 0', async() => {
+    const toSend = blogs.slice(blogs.length - 1, blogs.length) //blogs[blogs.length - 1]
+    delete toSend[0].likes // Delete the likes for the test
 
     await api
       .post('/api/blogs')
-      .send(toSend)
+      .set('Authorization', dummyUser.token)
+      .send(toSend[0])
       .expect(201)
     const response = await api.get('/api/blogs')
 
     expect(response.body).toHaveLength(3)
     expect(response.body[2].likes).toEqual(0)
+    expect(response.body[2].user.id.toString()).toEqual(dummyUser.id)
   })
 
   test('post request of blogs without "title" OR "url" should respond with 400 and not add the blogs', async() => {
@@ -118,16 +146,19 @@ describe('Normal post requests', () => {
     // See controllers/blog.js
     await api
       .post('/api/blogs')
+      .set('Authorization', dummyUser.token)
       .send(blogCopy[0])
       .expect(201)
 
     await api
       .post('/api/blogs')
+      .set('Authorization', dummyUser.token)
       .send(blogCopy[1])
       .expect(201)
 
     await api
       .post('/api/blogs')
+      .set('Authorization', dummyUser.token)
       .send(blogCopy[2])
       .expect(400)
   })
@@ -136,30 +167,68 @@ describe('Normal post requests', () => {
 describe('DELETE request', () => {
 
   test('should work on a simple blog', async() => {
-    let theBlogs = await helpers.blogsInDb()
-    // console.log(theBlogs)
-    expect(theBlogs).toHaveLength(2)
+    // Send a blog
     await api
-      .delete(`/api/blogs/${theBlogs[0].id}`)
+      .post('/api/blogs')
+      .set('Authorization', dummyUser.token)
+      .send(blogs[3])
+
+    let theBlogs = await helpers.blogsInDb()
+
+    expect(theBlogs).toHaveLength(3)
+    await api
+      .delete(`/api/blogs/${theBlogs[2].id}`)
+      .set('Authorization', dummyUser.token)
       .expect(204)
     theBlogs = await helpers.blogsInDb()
-    expect(theBlogs).toHaveLength(1)
+    expect(theBlogs).toHaveLength(2)
+  })
+
+  test('should not work on blogs not created by the user', async() => {
+    let theBlogs = await helpers.blogsInDb()
+
+    await api
+      .delete(`/api/blogs/${theBlogs[0].id}`)
+      .expect(401)
   })
 })
 
 describe('PUT request', () => {
 
   test('should change likes of a blog', async() => {
-    let theBlogs = await helpers.blogsInDb()
-    expect(theBlogs[0].likes).toEqual(7)
-    theBlogs[0].likes = 66
+
     await api
-      .put(`/api/blogs/${theBlogs[0].id}`)
-      .send(theBlogs[0])
+      .post('/api/blogs')
+      .set('Authorization', dummyUser.token)
+      .send(blogs[3])
+
+    let theBlogs = await helpers.blogsInDb()
+    expect(theBlogs[2].likes).toEqual(10)
+    theBlogs[2].likes = 66
+
+    await api
+      .put(`/api/blogs/${theBlogs[2].id}`)
+      .set('Authorization', dummyUser.token)
+      .send(theBlogs[2])
       .expect(200)
 
     theBlogs = await helpers.blogsInDb()
-    expect(theBlogs[0].likes).toEqual(66)
+    expect(theBlogs[2].likes).toEqual(66)
+    expect(theBlogs[2].user.toString()).toEqual(dummyUser.id)
+  })
+
+  // Testing whether the owner is someone else rather than having no owner
+  // was starting to get annoyingly hard to test
+  test('should not change likes if not blog has no owner', async() => {
+    
+    let theBlogs = await helpers.blogsInDb()
+    theBlogs[0].likes = 99
+
+    await api
+      .put(`/api/blogs/${theBlogs[0].id}`)
+      .set('Authorization', dummyUser.token)
+      .send(theBlogs[0])
+      .expect(401)
   })
 })
 
