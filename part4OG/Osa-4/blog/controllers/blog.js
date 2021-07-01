@@ -13,7 +13,7 @@ blogRouter.get('/', async(request, response) => {
 blogRouter.post('/', async(request, response) => {
   // Rules said only if both title AND url are missing
   // Maybe I am taking them too literally but changing && ---> || would then "fix" it
-  if(!request.body.title && !request.body.url){
+  if((!request.body.title && !request.body.url) || (request.body.title.length < 1 && request.body.url.length < 1)){
     response.status(400).end() //end() is needed it seems
     return
   }

@@ -71,7 +71,7 @@ beforeEach(async () => {
     .send({ username: dummyUser.username, password: dummyUser.password })
   
   dummyUser.token = 'bearer '.concat(response.body.token)
-  })
+})
 
 describe('GET request tests', () => {
 
