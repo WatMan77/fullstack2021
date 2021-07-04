@@ -20,7 +20,7 @@ const Blog = ({ blog, like, remove }) => {
   }
 
   return(
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       <div>{blog.title}</div>
       <div>{blog.author}</div>
       <div>{blog.likes} <button onClick={() => like(blog)}>like</button></div>
@@ -34,8 +34,7 @@ const Blog = ({ blog, like, remove }) => {
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   like: PropTypes.func.isRequired,
-  remove: PropTypes.func.isRequired
-
+  remove: PropTypes.func.isRequired,
 }
 
 export default Blog
