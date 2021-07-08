@@ -30,6 +30,13 @@ app.use(middleware.tokenExtractor)
 app.use('/api/blogs', middleware.userExtractor, blogRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+console.log('What are we doing?')
+
+if(process.env.NODE_ENV === 'test') {
+  console.log('WE ARE TESTING!!!!')
+  const testingRouter = require('./controllers/testRouter')
+  app.use('/api/testing', testingRouter)
+}
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

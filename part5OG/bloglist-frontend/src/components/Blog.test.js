@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect'
 import { render, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 import BlogForm from './BlogForm'
-import { prettyDOM } from '@testing-library/dom'
+// import { prettyDOM } from '@testing-library/dom'
 
 describe('<Blog />', () => {
   let component
