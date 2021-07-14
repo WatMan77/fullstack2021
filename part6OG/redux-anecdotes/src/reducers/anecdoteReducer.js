@@ -1,3 +1,6 @@
+import anecdoteService from '../services/anecdotes'
+import { setNotification, removeNotification } from '../reducers/notificationReducer'
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -7,34 +10,52 @@ const anecdotesAtStart = [
   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
 ]
 
-const getId = () => (100000 * Math.random()).toFixed(0)
+// const getId = () => (100000 * Math.random()).toFixed(0)
 
 const asObject = (anecdote) => {
   return {
     content: anecdote,
-    id: getId(),
     votes: 0
   }
 }
 
-const initialState = anecdotesAtStart.map(asObject)
+// const initialState = anecdotesAtStart.map(asObject)
 
-export const voteAnecdote = (id) => {
-  return {
-    type: 'VOTE',
-    data: { id }
+export const voteAnecdote = (anecdote) => {
+  return async dispatch => {
+    // Save vote to backend
+    await anecdoteService.saveVote(anecdote)
+    // Use dispatch to update the front-end page
+    dispatch({
+      type: 'VOTE',
+      data: { id: anecdote.id }
+    })
+    dispatch(setNotification(`You voted: '${anecdote.content}'`, 5))
   }
 }
 
 export const createAnecdote = (content) => {
-  console.log('What is content?', content)
-  return {
-    type: 'NEW_ANECDOTE',
-    data: content
+  return async dispatch => {
+    const newNote = await anecdoteService.createNew(content)
+    dispatch({
+      type: 'NEW_ANECDOTE',
+      data: newNote
+    })
+    dispatch(setNotification(`Anecdote created: ${newNote.content}`, 5))
   }
 }
 
-const reducer = (state = initialState, action) => {
+export const initializeAnecs = () => {
+  return async dispatch => {
+    const anecdotes = await anecdoteService.getAll()
+    dispatch({
+      type: 'INIT_ANECS',
+      data: anecdotes
+    })
+  }
+}
+
+const reducer = (state = [], action) => {
   console.log('state now: ', state)
   console.log('action', action)
   switch(action.type) {
@@ -50,8 +71,11 @@ const reducer = (state = initialState, action) => {
       return state.map(anec => anec.id === id ? changedAnec : anec)
     
     case 'NEW_ANECDOTE':
-      const anecdote = asObject(action.data)
-      return [...state, anecdote]
+      return [...state, action.data]
+
+    case 'INIT_ANECS':
+      return action.data
+
     default:
       return state
   }
