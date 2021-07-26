@@ -12,7 +12,7 @@ import { setNotification, setErrorMessage } from './reducers/notificationReducer
 import { initBlogs } from './reducers/blogReducer'
 import { setUser } from './reducers/userReducer'
 import {
-  Route, Switch,
+  Route, Switch, Link,
   useRouteMatch
 } from 'react-router-dom'
 import User from './components/User'
@@ -166,10 +166,11 @@ const App = () => {
 
   return (
     <div>
-      <div>
-        <p>{user.username} logged in
-          <button onClick={handleLogout}>logout</button>
-        </p>
+      <div style={{ padding: 5, backgroundColor: 'lightgray' }}>
+        <Link style={{ padding: 3 }} to={'/'}>blogs</Link>
+        <Link style={{ padding: 3 }} to={'/users'}>users</Link>
+        {user.username} logged in
+        <button onClick={handleLogout}>logout</button>
       </div>
       <Switch>
         <Route path='/blogs/:id'>
