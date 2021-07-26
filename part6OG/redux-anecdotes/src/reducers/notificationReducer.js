@@ -3,8 +3,8 @@ const initialState = ''
 export const setNotification = (message, time) => {
   return async dispatch => {
     dispatch({
-    type: 'MESSAGE',
-    data: message
+      type: 'MESSAGE',
+      data: message
     })
     console.log('Going empty in 5 seconds')
     setTimeout(() => {
