@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/blogs/60ffee91b8c54c43a06c5612/comments
+Content-Type: application/json
+
+{
+  "title": "Authorized book 2",
+  "author": "Arska edelleen",
+  "url": "www.arskansivu.com",
+  "likes": 100,
+  "comments": ["Second comment"]
+}

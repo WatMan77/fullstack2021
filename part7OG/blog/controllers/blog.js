@@ -10,6 +10,39 @@ blogRouter.get('/', async(request, response) => {
 
 // api/blogs or just /blogs ?
 
+blogRouter.post('/:id/comments', async(request, response) => {
+  // Highly controversial here!! Doing a post request, yet we 
+  // update the whole blog. This is an exact copy of the put request down below
+  // Reasoning for this was that this way we can keep the comments with the blog itself
+  // Maybe it should be a put request after all...
+
+
+  const foundBlog = await Blog.findById(request.params.id)
+  console.log('FoundBlog', foundBlog)
+
+  if(!foundBlog.comments) {
+    foundBlog.comments = []
+  }
+
+  const body = request.body // Holds the comment!
+
+  // const blog = { ...foundBlog, comments: foundBlog.comments.concat(body.comment) }
+
+  const blog = {
+    title: foundBlog.title,
+    author: foundBlog.author,
+    url: foundBlog.url,
+    likes: foundBlog.likes,
+    comments: foundBlog.comments.concat(body.comment)
+  }
+
+  console.log('Updated with comment', blog)
+
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+  
+  response.json(updatedBlog)
+})
+
 blogRouter.post('/', async(request, response) => {
   // Rules said only if both title AND url are missing
   // Maybe I am taking them too literally but changing && ---> || would then "fix" it
@@ -72,6 +105,7 @@ blogRouter.put('/:id', async(request, response) => {
     author: body.author,
     url: body.url,
     likes: body.likes,
+    comments: body.comments
     // user: toChange.user
   }
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })

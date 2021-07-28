@@ -1,6 +1,5 @@
 import React, { useState,  } from 'react'
 
-
 const BlogForm = ({ createBlog }) => {
 
   const [title, setTitle] = useState('')

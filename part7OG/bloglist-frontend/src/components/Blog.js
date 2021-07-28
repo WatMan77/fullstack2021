@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+// import { useDispatch } from 'react-redux'
 
 const blogStyle = {
   paddingTop: 10,
@@ -18,8 +19,16 @@ export const BlogLink = ({ blog }) => {
   )
 }
 
-const Blog = ({ blog, like, remove }) => {
+const Blog = ({ blog, like, remove, comment }) => {
 
+  // Preventing an "undefined" error here as older blogs might not have comments
+  if(!blog){
+    return null
+  }
+  let comments = []
+  if(blog.comments) {
+    comments = blog.comments
+  }
 
   return(
     <div style={blogStyle} className='blog'>
@@ -29,6 +38,16 @@ const Blog = ({ blog, like, remove }) => {
       <div id='likes'>{blog.likes} <button id='like-button' onClick={() => like(blog)}>like</button></div>
       <div><button onClick={() => remove(blog)}>remove</button></div>
       <p>added by {blog.user.username}</p>
+      <form onSubmit={comment}>
+        <input name='comment'/>
+        <button type='submit'>add comment</button>
+      </form>
+      <h2>comments</h2>
+      <ul>
+        {comments.map((x, i) =>
+          <li key={i}>{x}</li>
+        )}
+      </ul>
     </div>
   )
 }

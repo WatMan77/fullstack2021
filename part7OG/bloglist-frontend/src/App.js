@@ -32,12 +32,11 @@ const App = () => {
   const userMatch = match
     ? blogs.filter(x => match.params.id === x.user.id)
     : []
-  // Generally, neither of these should get an "undefined"
-  // as all id's are taken from the links and not typed by the user
+
   const blogMatcher = useRouteMatch('/blogs/:id')
   const blogMatch = blogMatcher
     ? blogs.find(x => blogMatcher.params.id === x.id)
-    : []
+    : {} // This causes a "failed prop" error at first
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -111,7 +110,19 @@ const App = () => {
     } catch(exception) {
       dispatch(setErrorMessage('Removal failed', 5))
     }
+  }
 
+  const commentBlog = async(event) => {
+    try {
+      event.preventDefault()
+      await blogService.comment({ id: blogMatcher.params.id, comment: event.target.comment.value })
+      event.target.comment.value = ''
+      // Possible dispatch initBlogs needed
+      dispatch(initBlogs(await blogService.getAll()))
+    } catch(error) {
+      console.log(error)
+      dispatch(setErrorMessage('Problem adding a comment', 5))
+    }
   }
 
   const handleLogout = () => {
@@ -166,6 +177,8 @@ const App = () => {
 
   return (
     <div>
+      <ErrorNotif message={notifications.error}/>
+      <Notification message={notifications.notification}/>
       <div style={{ padding: 5, backgroundColor: 'lightgray' }}>
         <Link style={{ padding: 3 }} to={'/'}>blogs</Link>
         <Link style={{ padding: 3 }} to={'/users'}>users</Link>
@@ -174,8 +187,7 @@ const App = () => {
       </div>
       <Switch>
         <Route path='/blogs/:id'>
-          <Blog key={blogMatch.id} blog={blogMatch} like={likeBlog} remove={removeBlog} />
-
+          <Blog blog={blogMatch} like={likeBlog} remove={removeBlog} comment={commentBlog} />
         </Route>
         <Route path='/users/:id'>
           <h2>added blogs</h2>
@@ -194,8 +206,6 @@ const App = () => {
         </Route>
         <Route path='/'>
           <div>
-            <ErrorNotif message={notifications.error}/>
-            <Notification message={notifications.notification}/>
             <h2>Blogs front page</h2>
             Create new Blog
             {blogForm()}
