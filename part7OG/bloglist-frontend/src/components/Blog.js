@@ -6,8 +6,6 @@ import { Link } from 'react-router-dom'
 const blogStyle = {
   paddingTop: 10,
   paddingLeft: 2,
-  border: 'solid',
-  borderWidth: 1,
   marginBottom: 5
 }
 
@@ -31,7 +29,7 @@ const Blog = ({ blog, like, remove, comment }) => {
   }
 
   return(
-    <div style={blogStyle} className='blog'>
+    <div>
       <div><h1>{blog.title}</h1></div>
       <div><Link to={blog.url}>{blog.url}</Link></div>
       <div>{blog.author}</div>

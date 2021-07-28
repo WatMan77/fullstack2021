@@ -8,12 +8,21 @@ const User = ({ username, amount, id }) => {
     marginBottom: 5,
   }
 
-  //Personally did not have a problem with the user being
+  //Personally did not have a problem with the user
   // not being defined
 
   return (
     <div style={userStyle}>
-      <Link to={`/users/${id}`}>{username}</Link> {amount}
+      <tbody>
+        <tr>
+          <td>
+            <Link to={`/users/${id}`}>{username}</Link>
+          </td>
+          <td>
+            {amount}
+          </td>
+        </tr>
+      </tbody>
     </div>
   )
 }

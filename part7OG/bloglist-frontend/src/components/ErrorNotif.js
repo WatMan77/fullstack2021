@@ -1,4 +1,5 @@
 import React from 'react'
+import { Alert } from 'react-bootstrap'
 
 const ErrorNotif = ({ message }) => {
   if(message === null){
@@ -6,8 +7,11 @@ const ErrorNotif = ({ message }) => {
   }
 
   return (
-    <div className="error">
-      {message}
+    <div>
+      {(message &&
+        <Alert variant='danger'>
+          {message}
+        </Alert>)}
     </div>
   )
 }

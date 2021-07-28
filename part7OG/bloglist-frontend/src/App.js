@@ -16,6 +16,7 @@ import {
   useRouteMatch
 } from 'react-router-dom'
 import User from './components/User'
+import { Table, Form, Button, ListGroup, Navbar, Nav } from 'react-bootstrap'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -131,29 +132,30 @@ const App = () => {
   }
 
   const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
+    <Form onSubmit={handleLogin}>
+      <Form.Label>username</Form.Label>
+      <Form.Group>
+        <Form.Control
           id='username'
           type='text'
-          value={username}
           name='username'
+          value={username}
           onChange={({ target }) => setUsername(target.value)}
         />
-      </div>
-      <div>
-        password
-        <input
+        <Form.Label>password</Form.Label>
+        <Form.Control
           id='password'
-          type="password"
+          type='password'
           value={password}
-          name="password"
+          name='password'
           onChange={({ target }) => setPassword(target.value)}
         />
-      </div>
-      <button id='login-button' type='submit'>login</button>
-    </form>
+        <Button variant='primary' type='submit'>
+          login
+        </Button>
+
+      </Form.Group>
+    </Form>
   )
 
   const blogForm = () => {
@@ -179,39 +181,63 @@ const App = () => {
     <div>
       <ErrorNotif message={notifications.error}/>
       <Notification message={notifications.notification}/>
-      <div style={{ padding: 5, backgroundColor: 'lightgray' }}>
-        <Link style={{ padding: 3 }} to={'/'}>blogs</Link>
-        <Link style={{ padding: 3 }} to={'/users'}>users</Link>
-        {user.username} logged in
-        <button onClick={handleLogout}>logout</button>
-      </div>
+      <Navbar collapseOnSelect expand='lg' bg='light' variant='dark'>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className='mr-auto'>
+            <Nav.Link href='#' as='span'>
+              <Link style={{ padding: 3 }} to={'/'}>blogs</Link>
+            </Nav.Link>
+            <Nav.Link href='#' as='span'>
+              <Link style={{ padding: 3 }} to={'/users'}>users</Link>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+        <em>{user.username} logged in</em>
+        <Button onClick={handleLogout}>logout</Button>
+      </Navbar>
+
       <Switch>
         <Route path='/blogs/:id'>
           <Blog blog={blogMatch} like={likeBlog} remove={removeBlog} comment={commentBlog} />
         </Route>
         <Route path='/users/:id'>
           <h2>added blogs</h2>
-          <ul>
+          <ListGroup>
             {userMatch.map(x =>
-              <li style={{ paddingRight: 5 }} key={x.id}>{x.title}</li>
+              <ListGroup.Item key={x.id}>{x.title}</ListGroup.Item>
             )}
-          </ul>
+          </ListGroup>
         </Route>
         <Route path='/users'>
           <h1>Users</h1>
           <h2>blogs created</h2>
-          {blogUsers.map(x =>
-            <User key={x.id} username={x.username} amount={x.blogs.length} id={x.id} />
-          )}
+          <Table striped>
+            <tbody>
+              {blogUsers.map(x =>
+                <tr key={x.id}>
+                  <td>
+                    <User username={x.username} amount={x.blogs.length} id={x.id} />
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
         </Route>
         <Route path='/'>
           <div>
             <h2>Blogs front page</h2>
             Create new Blog
             {blogForm()}
-            {blogs.map(blog =>
-              <BlogLink key={blog.id} blog={blog} />
-            )}
+            <Table striped>
+              <tbody>
+                {blogs.map(blog =>
+                  <tr key={blog.id}>
+                    <BlogLink key={blog.id} blog={blog} />
+                  </tr>
+                )}
+              </tbody>
+            </Table>
           </div>
         </Route>
       </Switch>
