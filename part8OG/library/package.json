@@ -4,13 +4,19 @@
   "description": "graphql_begin",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "dev": "nodemon index.js"
   },
   "author": "Daniel",
   "license": "ISC",
   "dependencies": {
     "apollo-server": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "graphql": "^15.5.1",
+    "mongoose": "^5.13.5",
+    "node-env": "^0.1.6",
+    "nodemon": "^2.0.12",
     "uuid": "^8.3.2"
   }
 }
