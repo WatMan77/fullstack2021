@@ -130,7 +130,7 @@ const typeDefs = gql`
       title: String!
       published: Int!
       genres: [String!]
-      name: String!
+      author: String!
       born: Int
     ): Book
 
@@ -166,27 +166,27 @@ const resolvers = {
       // x.bookCount = books.filter(l => l.author === x.name).length
       // return x
     // })
-  },
+  },/* 
   Book: {
     author: (root) => {
       return {
-        name: root.name,
+        name: root.author,
         born: root.born
       }
     }
-  },
+  }, */
 
   Mutation: {
-    addBook: (root, args) => {
+    addBook: async(root, args) => {
       console.log('creating a book!')
-      const author = new Author({ name: args.name })
-      if(!authors.includes(args.name)) {
+      const author = new Author({ name: args.author })
+      if(!authors.includes(args.author)) {
         console.log('Created author:', author)
         authors = authors.concat(author)
-        author.save()
+        await author.save()
       }
       console.log('args?', args)
-      const book = new Book({ author: author._id, ...args })
+      const book = new Book({ ...args, author: author.id })
       console.log('created book', book)
       books = books.concat(book)
       console.log('saving book...')
