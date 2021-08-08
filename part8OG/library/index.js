@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const config = require('./config.js')
 const Book = require('./models/book.js')
 const Author = require('./models/author.js')
+const book = require('./models/book.js')
 
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
   .then(() => {
@@ -137,7 +138,6 @@ const typeDefs = gql`
       name: String,
        setBornTo: Int
       ): Author
-
   }
 `
 
@@ -146,8 +146,10 @@ const resolvers = {
   Query: {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => authors.length,
-    allBooks: (root, args) => {
-      return Book.find({})
+    allBooks: async(root, args) => {
+      let foundBooks = await Book.find({}).populate('author')
+      console.log('foundBooks now:', foundBooks)
+      return foundBooks
       // let booksCopy = [...books]
       // if(args.author){
       //   booksCopy = booksCopy.filter(x => x.author === args.author)
