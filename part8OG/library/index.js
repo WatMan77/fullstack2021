@@ -91,9 +91,16 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async(root, args) => {
+      console.log('All books with:', args)
+      if(args.genre) {
+        console.log('Filtering books of genre', args.genre)
+        const foundBooks = await Book.find({ genres: { $in: [args.genre] }}).populate('author')
+        return foundBooks
+      }
       let foundBooks = await Book.find({}).populate('author')
       return foundBooks
     },
+    // Seems like the  n+1 problem was already solved from the beginning
     allAuthors: async() => {
       let books = await Book.find({}).populate('author')
       let authors = await Author.find({})
