@@ -136,7 +136,6 @@ const resolvers = {
           invalidArgs: args
         })
       }
-      console.log('Publishing...')
       pubsub.publish('BOOK_ADDED', { bookAdded: book })
 
       return book
