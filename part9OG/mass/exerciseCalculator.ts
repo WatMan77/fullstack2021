@@ -23,7 +23,14 @@ const ratingCalculation = (average: number,  target: number): number => {
 
 export const execCalculator = (hours: Array<number>, target: number): ExerciseValues => {
 
+  hours.forEach(x => {
+    if(isNaN(Number(x))){
+      throw new Error('malformatted parameters');
+    }
+  });
+
   const averageHours: number = hours.reduce((a, b) => a + b) / hours.length;
+  console.log('average hours', averageHours);
 
   const descritpions: Array<RatingDescription> = ['Not good...', 'It was ok', 'Nicely done! Keep it up!'];
 

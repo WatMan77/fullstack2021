@@ -18,14 +18,20 @@ app.get('/bmi', (_req, res) => {
 });
 
 app.post('/exercises', (_req, res) => {
+  console.log('The body', _req.body);
 
-  if(!_req.body.daily_exercises || _req.body.target){
+  if(!_req.body.daily_exercises || !_req.body.target){
     res.send({ error: 'Parameters missing'});
+    return;
   }
   const { daily_exercises, target } = _req.body;
-  const result = execCalculator(daily_exercises, target);
-
-  res.send(result);
+  try {
+    const result = execCalculator(daily_exercises, target);
+    res.json(result);
+    return;
+  } catch (e) {
+    res.send({ error: e.message});
+  }
 });
 
 const PORT = 3003;
