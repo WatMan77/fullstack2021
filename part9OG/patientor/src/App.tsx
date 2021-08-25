@@ -4,10 +4,11 @@ import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import { Button, Divider, Header, Container } from "semantic-ui-react";
 
 import { apiBaseUrl } from "./constants";
-import { useStateValue } from "./state";
-import { Patient } from "./types";
+import { useStateValue, setPatientList, setDiagnosisList } from "./state";
+import { Diagnosis, Patient } from "./types";
 
 import PatientListPage from "./PatientListPage";
+import PatientPage from "./components/Patient";
 
 const App = () => {
   const [, dispatch] = useStateValue();
@@ -19,7 +20,11 @@ const App = () => {
         const { data: patientListFromApi } = await axios.get<Patient[]>(
           `${apiBaseUrl}/patients`
         );
-        dispatch({ type: "SET_PATIENT_LIST", payload: patientListFromApi });
+        const { data: diagnosisListFromapi } = await axios.get<Diagnosis[]>(
+          `${apiBaseUrl}/diagnosis`
+        );
+        dispatch(setPatientList(patientListFromApi));
+        dispatch(setDiagnosisList(diagnosisListFromapi));
       } catch (e) {
         console.error(e);
       }
@@ -37,8 +42,11 @@ const App = () => {
           </Button>
           <Divider hidden />
           <Switch>
+            <Route path="/patient/:id">
+              <PatientPage />
+            </Route>
             <Route path="/">
-              <PatientListPage />
+              <PatientListPage/>
             </Route>
           </Switch>
         </Container>
